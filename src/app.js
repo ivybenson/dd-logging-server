@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const cors = require("cors");
 const helmet = require("helmet");
 const { NODE_ENV } = require("./config");
+const CampaignRouter = require("./campaign/campaign-router");
 
 const app = express();
 
@@ -12,6 +13,12 @@ const morganOption = NODE_ENV === "production";
 app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
+
+app.use("/api/users", UsersRouter);
+app.use("/api/campaign", CampaignRouter);
+// app.use("/api/character", CharacterRouter);
+// app.use("/api/post", PostRouter);
+// app.use("/api/auth", AuthRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello, dnd logger!");

@@ -4,10 +4,10 @@ CREATE TABLE characters (
     REFERENCES campaigns(id) ON DELETE CASCADE NOT NULL, 
     user_id INTEGER 
     REFERENCES users(id) ON DELETE CASCADE NOT NULL,
-    name TEXT NOT NULL, 
-    race TEXT NOT NULL,
-    class TEXT NOT NULL, 
-    level INTEGER, 
-    additional info TEXT, 
-    datecreated TIMESTAMPTZ DEFAULT now() NOT NULL,
+name TEXT NOT NULL, 
+race TEXT NOT NULL,
+class TEXT NOT NULL, 
+level INTEGER, 
+additionalInfo TEXT, 
+datecreated TIMESTAMPTZ DEFAULT now() NOT NULL,
 );
