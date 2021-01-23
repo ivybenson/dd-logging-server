@@ -45,6 +45,7 @@ CampaignRouter.route("/")
     CampaignService.insertCampaign(req.app.get("db"), newCampaign)
       .then((campaign) => {
         logger.info(`campaign with id ${campaign.id} created.`);
+        // this is where we would call CharacterService.createCharacter(req.app.get('db'),req.user.id,campaign.id)
         res
           .status(201)
           .location(path.posix.join(req.originalUrl, `${campaign.id}`))

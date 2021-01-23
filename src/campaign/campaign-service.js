@@ -23,12 +23,12 @@ const campaignService = {
       .then((rows) => rows[0]);
   },
 
-  deleteCampaign(knex, id) {
-    return knex("campaigns").where({ id }).delete();
-  },
-  updateCampaign(knex, id, newCampaignFields) {
-    return knex("campaigns").where({ id }).update(newCampaignFields);
-  },
+  //   deleteCampaign(knex, id) {
+  //     return knex("campaigns").where({ id }).delete();
+  //   },
+  //   updateCampaign(knex, id, newCampaignFields) {
+  //     return knex("campaigns").where({ id }).update(newCampaignFields);
+  //   },
 };
 
 module.exports = campaignService;
