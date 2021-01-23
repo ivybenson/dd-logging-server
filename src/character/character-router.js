@@ -2,35 +2,51 @@ const path = require("path");
 const express = require("express");
 const xss = require("xss");
 const logger = require("../logger");
-const CampaignService = require("./campaign-service");
-const { getCampaignValidationError } = require("./campaign-validator");
+const CharacterService = require("./charcter-service");
+const { getCharacterValidationError } = require("./character-validator");
 
 const { requireAuth } = require("../middleware/jwt-auth");
 
-const CampaignRouter = express.Router();
+const CharacterRouter = express.Router();
 const bodyParser = express.json();
 
-const SerializeCharacter = (campaign) => ({
-  name: xss(campaign.name),
+const SerializeCharacter = (character) => ({
+  name: xss(character.name),
 });
 
-CampaignRouter.route("/")
+CharacterService.route("/")
 
   .get(requireAuth, (req, res, next) => {
     console.log({ user: req.user });
-    CampaignService.getCampaignById(req.app.get("db"), req.user.id)
-      .then((campaign) => {
-        res.json(campaign.map(SerializeCampaign));
+    CharacterService.getCampaignById(req.app.get("db"), req.user.id)
+      .then((character) => {
+        res.json(character.map(SerializeCharacter));
       })
       .catch(next);
   })
 
   .post(requireAuth, bodyParser, (req, res, next) => {
-    const { name } = req.body;
-    const newCampaign = { name };
+    const {
+      campaign_id,
+      user_id,
+      name,
+      race,
+      characterClass,
+      level,
+      additionalInfo,
+    } = req.body;
+    const newCharacter = {
+      campaign_id,
+      user_id,
+      name,
+      race,
+      characterClass,
+      level,
+      additionalInfo,
+    };
 
     for (const field of ["name"]) {
-      if (!newCampaign[field]) {
+      if (!newCharacter[field]) {
         logger.error(`${field} is required`);
         return res.status(400).send({
           error: { message: `'${field}' is required` },
@@ -38,20 +54,19 @@ CampaignRouter.route("/")
       }
     }
 
-    const error = getCampaignValidationError(newCampaign);
+    const error = getCharacterValidationError(newCharacter);
 
     if (error) return res.status(400).send(error);
 
-    CampaignService.insertCampaign(req.app.get("db"), newCampaign)
-      .then((campaign) => {
-        logger.info(`campaign with id ${campaign.id} created.`);
-        // this is where we would call CharacterService.createCharacter(req.app.get('db'),req.user.id,campaign.id)
+    CharacterService.insertCharacter(req.app.get("db"), newCharacter)
+      .then((character) => {
+        logger.info(`character with id ${character.id} created.`);
         res
           .status(201)
-          .location(path.posix.join(req.originalUrl, `${campaign.id}`))
-          .json(SerializeCampaign(campaign));
+          .location(path.posix.join(req.originalUrl, `${character.id}`))
+          .json(SerializeCharacter(character));
       })
       .catch(next);
   });
 
-module.exports = CampaignRouter;
+module.exports = CharacterRouter;

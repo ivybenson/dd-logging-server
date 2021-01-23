@@ -11,19 +11,20 @@ const characterService = {
       .orderBy("created", "desc");
   },
 
-  insertCharacter(knex, newCampaign) {
+  insertCharacter(knex, newCharacter) {
     return knex
-      .insert(newCampaign)
+      .insert(newCharacter)
       .into("characters")
       .returning("*")
       .then((rows) => rows[0]);
   },
 
-  //   deleteCampaign(knex, id) {
-  //     return knex("campaigns").where({ id }).delete();
-  //   },
-  //   updateCampaign(knex, id, newCampaignFields) {
-  //     return knex("campaigns").where({ id }).update(newCampaignFields);
+  updateCharacter(knex, id, newCharacterFields) {
+    return knex("characters").where({ id }).update(newCharacterFields);
+  },
+
+  //   deleteCharacter(knex, id) {
+  //     return knex("characters").where({ id }).delete();
   //   },
 };
 

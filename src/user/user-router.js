@@ -55,20 +55,20 @@ userRouter
       });
     }
 
-    UsersService.hasUserWithEmail(knexInstance, email).then((hasUser) => {
+    UserService.hasUserWithEmail(knexInstance, email).then((hasUser) => {
       if (hasUser) {
         return res.status(400).json({
           error: "Email already used.",
         });
       }
 
-      return UsersService.hashPassword(password).then((hashedPassword) => {
+      UserService.hashPassword(password).then((hashedPassword) => {
         const newUser = {
           email,
           password: hashedPassword,
         };
 
-        return UsersService.insertUser(knexInstance, newUser).then((user) => {
+        return UserService.insertUser(knexInstance, newUser).then((user) => {
           res.status(201).json(SerializeUser(user));
         });
       });
