@@ -14,7 +14,7 @@ const SerializeCharacter = (character) => ({
   name: xss(character.name),
 });
 
-CharacterService.route("/")
+CharacterRouter.route("/")
 
   .get(requireAuth, (req, res, next) => {
     console.log({ user: req.user });

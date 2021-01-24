@@ -1,34 +1,34 @@
-const campaignService = {
-  getAllCampaigns(knex) {
-    return knex.select("*").from("campaigns");
+const postService = {
+  getAllpost(knex) {
+    return knex.select("*").from("post");
   },
 
-  getCampaignById(knex, id) {
-    return knex.from("campaigns").select("*").where({ id }).first();
+  getpostaignById(knex, id) {
+    return knex.from("post").select("*").where({ id }).first();
   },
 
-  getCampaignsByUser(knex, user_id) {
+  getpostByUser(knex, user_id) {
     return knex
-      .from("campaigns")
+      .from("post")
       .select("*")
       .where({ user_id })
       .orderBy("created", "desc");
   },
 
-  insertCampaign(knex, newCampaign) {
+  insertpostaign(knex, newpostaign) {
     return knex
-      .insert(newCampaign)
-      .into("campaigns")
+      .insert(newpostaign)
+      .into("post")
       .returning("*")
       .then((rows) => rows[0]);
   },
 
-  //   deleteCampaign(knex, id) {
-  //     return knex("campaigns").where({ id }).delete();
+  //   deletepostaign(knex, id) {
+  //     return knex("post").where({ id }).delete();
   //   },
-  //   updateCampaign(knex, id, newCampaignFields) {
-  //     return knex("campaigns").where({ id }).update(newCampaignFields);
+  //   updatepostaign(knex, id, newpostaignFields) {
+  //     return knex("post").where({ id }).update(newpostaignFields);
   //   },
 };
 
-module.exports = campaignService;
+module.exports = postService;

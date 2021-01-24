@@ -2,35 +2,37 @@ const path = require("path");
 const express = require("express");
 const xss = require("xss");
 const logger = require("../logger");
-const CampaignService = require("./campaign-service");
-const { getCampaignValidationError } = require("./campaign-validator");
+const postService = require("./post-service");
+const { getPostValidationError } = require("./post-validator");
 
 const { requireAuth } = require("../middleware/jwt-auth");
 
-const CampaignRouter = express.Router();
+const postRouter = express.Router();
 const bodyParser = express.json();
 
-const SerializeCampaign = (campaign) => ({
-  name: xss(campaign.name),
+const Serializepost = (post) => ({
+  name: xss(post.name),
 });
 
-CampaignRouter.route("/")
+postRouter
+  .route("/")
 
   .get(requireAuth, (req, res, next) => {
     console.log({ user: req.user });
-    CampaignService.getCampaignById(req.app.get("db"), req.user.id)
-      .then((campaign) => {
-        res.json(campaign.map(SerializeCampaign));
+    postService
+      .getpostById(req.app.get("db"), req.user.id)
+      .then((post) => {
+        res.json(post.map(Serializepost));
       })
       .catch(next);
   })
 
   .post(requireAuth, bodyParser, (req, res, next) => {
     const { name } = req.body;
-    const newCampaign = { name };
+    const newpost = { name };
 
     for (const field of ["name"]) {
-      if (!newCampaign[field]) {
+      if (!newpost[field]) {
         logger.error(`${field} is required`);
         return res.status(400).send({
           error: { message: `'${field}' is required` },
@@ -38,20 +40,21 @@ CampaignRouter.route("/")
       }
     }
 
-    const error = getCampaignValidationError(newCampaign);
+    const error = getpostValidationError(newpost);
 
     if (error) return res.status(400).send(error);
 
-    CampaignService.insertCampaign(req.app.get("db"), newCampaign)
-      .then((campaign) => {
-        logger.info(`campaign with id ${campaign.id} created.`);
-        // this is where we would call CharacterService.createCharacter(req.app.get('db'),req.user.id,campaign.id)
+    postService
+      .insertpost(req.app.get("db"), newpost)
+      .then((post) => {
+        logger.info(`post with id ${post.id} created.`);
+        // this is where we would call CharacterService.createCharacter(req.app.get('db'),req.user.id,post.id)
         res
           .status(201)
-          .location(path.posix.join(req.originalUrl, `${campaign.id}`))
-          .json(SerializeCampaign(campaign));
+          .location(path.posix.join(req.originalUrl, `${post.id}`))
+          .json(Serializepost(post));
       })
       .catch(next);
   });
 
-module.exports = CampaignRouter;
+module.exports = postRouter;
