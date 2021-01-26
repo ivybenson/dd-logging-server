@@ -5,6 +5,8 @@ const Knex = require("knex");
 const authRouter = express.Router();
 const bodyParser = express.json();
 
+const { requireAuth } = require("../middleware/jwt-auth");
+
 authRouter
   .route("/login")
   .all((req, res, next) => {

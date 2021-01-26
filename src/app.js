@@ -5,7 +5,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const { NODE_ENV } = require("./config");
 const CampaignRouter = require("./campaign/campaign-router");
-const UserRouter = require("./user/user-router");
+const UsersRouter = require("./users/users-router");
 const CharacterRouter = require("./character/character-router");
 const PostRouter = require("./post/post-router");
 const AuthRouter = require("./auth/auth-router");
@@ -20,7 +20,7 @@ app.use(
 app.use(cors());
 app.use(helmet());
 
-app.use("/api/user", UserRouter);
+app.use("/api/users", UsersRouter);
 app.use("/api/campaign", CampaignRouter);
 app.use("/api/character", CharacterRouter);
 app.use("/api/post", PostRouter);
