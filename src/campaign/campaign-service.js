@@ -1,3 +1,5 @@
+const knex = require("knex");
+
 const campaignService = {
   getAllCampaigns(knex) {
     return knex.select("*").from("campaigns");

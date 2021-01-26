@@ -1,3 +1,5 @@
+const knex = require("knex");
+
 const characterService = {
   getCharacternById(knex, id) {
     return knex.from("characters").select("*").where({ id }).first();

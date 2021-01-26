@@ -4,6 +4,7 @@ const xss = require("xss");
 const logger = require("../logger");
 const CharacterService = require("./charcter-service");
 const { getCharacterValidationError } = require("./character-validator");
+const knex = require("knex");
 
 const { requireAuth } = require("../middleware/jwt-auth");
 

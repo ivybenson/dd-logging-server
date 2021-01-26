@@ -1,34 +1,36 @@
+const knex = require("knex");
+
 const postService = {
   getAllpost(knex) {
-    return knex.select("*").from("post");
+    return knex.select("*").from("posts");
   },
 
-  getpostaignById(knex, id) {
-    return knex.from("post").select("*").where({ id }).first();
+  getPostById(knex, id) {
+    return knex.from("posts").select("*").where({ id }).first();
   },
 
-  getpostByUser(knex, user_id) {
+  getPostByUser(knex, user_id) {
     return knex
-      .from("post")
+      .from("posts")
       .select("*")
       .where({ user_id })
       .orderBy("created", "desc");
   },
 
-  insertpostaign(knex, newpostaign) {
+  insertPost(knex, newPost) {
     return knex
-      .insert(newpostaign)
-      .into("post")
+      .insert(newPost)
+      .into("posts")
       .returning("*")
       .then((rows) => rows[0]);
   },
 
-  //   deletepostaign(knex, id) {
-  //     return knex("post").where({ id }).delete();
-  //   },
-  //   updatepostaign(knex, id, newpostaignFields) {
-  //     return knex("post").where({ id }).update(newpostaignFields);
-  //   },
+  deletePost(knex, id) {
+    return knex("posts").where({ id }).delete();
+  },
+  updatePost(knex, id, newPostFields) {
+    return knex("posts").where({ id }).update(newPostFields);
+  },
 };
 
 module.exports = postService;

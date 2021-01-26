@@ -4,6 +4,7 @@ const xss = require("xss");
 const logger = require("../logger");
 const CampaignService = require("./campaign-service");
 const { getCampaignValidationError } = require("./campaign-validator");
+const knex = require("knex");
 
 const { requireAuth } = require("../middleware/jwt-auth");
 

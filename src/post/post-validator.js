@@ -1,5 +1,6 @@
 const { isWebUri } = require("valid-url");
 const logger = require("../logger");
+const knex = require("knex");
 
 const NO_ERRORS = null;
 

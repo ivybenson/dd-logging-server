@@ -3,6 +3,7 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const helmet = require("helmet");
+const knex = require("knex");
 const { NODE_ENV } = require("./config");
 const CampaignRouter = require("./campaign/campaign-router");
 const UsersRouter = require("./users/users-router");
