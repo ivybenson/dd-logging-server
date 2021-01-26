@@ -19,7 +19,7 @@ CampaignRouter.route("/")
 
   .get(requireAuth, (req, res, next) => {
     console.log({ user: req.user });
-    CampaignService.getCampaignById(req.app.get("db"), req.user.id)
+    CampaignService.getCampaignByUser(req.app.get("db"), req.user.id)
       .then((campaign) => {
         res.json(campaign.map(SerializeCampaign));
       })

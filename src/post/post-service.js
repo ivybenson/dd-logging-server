@@ -1,7 +1,7 @@
 const knex = require("knex");
 
 const postService = {
-  getAllpost(knex) {
+  getAllPosts(knex) {
     return knex.select("*").from("posts");
   },
 

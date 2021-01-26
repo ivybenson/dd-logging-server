@@ -12,7 +12,11 @@ const postRouter = express.Router();
 const bodyParser = express.json();
 
 const SerializePost = (post) => ({
-  name: xss(post.name),
+  id: posts.id,
+  character_id: posts.characters_id,
+  title: xss(posts.title),
+  content: xss(posts.content),
+  completed: posts.completed,
 });
 
 postRouter
@@ -21,19 +25,19 @@ postRouter
   .get(requireAuth, (req, res, next) => {
     console.log({ user: req.user });
     postService
-      .getpostById(req.app.get("db"), req.user.id)
-      .then((post) => {
-        res.json(post.map(SerializePost));
+      .getpostByUser(req.app.get("db"), req.user.id)
+      .then((posts) => {
+        res.json(posts.map(SerializePost));
       })
       .catch(next);
   })
 
   .post(requireAuth, bodyParser, (req, res, next) => {
     const { name } = req.body;
-    const newpost = { name };
+    const newPost = { name };
 
     for (const field of ["name"]) {
-      if (!newpost[field]) {
+      if (!newPost[field]) {
         logger.error(`${field} is required`);
         return res.status(400).send({
           error: { message: `'${field}' is required` },
@@ -41,12 +45,12 @@ postRouter
       }
     }
 
-    const error = getpostValidationError(newpost);
+    const error = getpostValidationError(newPost);
 
     if (error) return res.status(400).send(error);
 
     postService
-      .insertpost(req.app.get("db"), newpost)
+      .insertpost(req.app.get("db"), newPost)
       .then((post) => {
         logger.info(`post with id ${post.id} created.`);
         res
@@ -63,7 +67,7 @@ postRouter
   .all((req, res, next) => {
     const { post_id } = req.params;
     postService
-      .getNoteById(req.app.get("db"), post_id)
+      .getPostById(req.app.get("db"), post_id)
       .then((post) => {
         if (!post) {
           logger.error(`Post with id ${post_id} not found.`);
