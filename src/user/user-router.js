@@ -2,12 +2,11 @@ const express = require("express");
 const xss = require("xss");
 const logger = require("../logger");
 const UserService = require("./user-service");
-const { getUserValidationError } = require("./user-validator");
 const Knex = require("knex");
 const bcrypt = require("bcryptjs");
 const { requireAuth } = require("../middleware/jwt-auth");
 
-const userRouter = express.Router();
+const UserRouter = express.Router();
 const bodyParser = express.json();
 
 const SerializeUser = (user) => ({
@@ -16,8 +15,7 @@ const SerializeUser = (user) => ({
   datecreated: user.datecreated,
 });
 
-userRouter
-  .route("/")
+UserRouter.route("/")
 
   .all((req, res, next) => {
     knexInstance = req.app.get("db");
@@ -62,7 +60,7 @@ userRouter
         });
       }
 
-      UserService.hashPassword(password).then((hashedPassword) => {
+      return UserService.hashPassword(password).then((hashedPassword) => {
         const newUser = {
           email,
           password: hashedPassword,
@@ -75,4 +73,4 @@ userRouter
     });
   });
 
-module.exports = userRouter;
+module.exports = UserRouter;
