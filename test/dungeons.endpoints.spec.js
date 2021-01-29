@@ -3,12 +3,15 @@ const knex = require("knex");
 const supertest = require("supertest");
 const app = require("../src/app");
 const { makeUsersArray } = require("./users.fixtures");
-const { makeHabitArray } = require("./habits.fixtures");
-const { makeProgressArray } = require("./progress.fixtures");
+const { makePostsArray } = require("./posts.fixtures");
+const { makeCharactersArray } = require("./characters.fixtures");
+const { makeCampaignsArray } = require("./campaigns.fixtures");
 
-const HabitsService = require("../src/habits/habit-service");
+const CampaignService = require("../src/campaign/campaign-service");
+const PostService = require("../src/post/post-service");
+const CharacterService = require("../src/character/character-service");
 
-describe(`Habits service object`, function () {
+describe(`Campaign service object`, function () {
   let db;
   let authToken;
 
@@ -46,118 +49,137 @@ describe(`Habits service object`, function () {
   after("disconnect from db", () => db.destroy());
 
   before("clean the table", () =>
-    db.raw("TRUNCATE users, hbits, progress RESTART IDENTITY CASCADE")
+    db.raw(
+      "TRUNCATE users, campaigns, characters, posts RESTART IDENTITY CASCADE"
+    )
   );
 
   afterEach("cleanup", () =>
-    db.raw("TRUNCATE users, hbits, progress RESTART IDENTITY CASCADE")
+    db.raw(
+      "TRUNCATE users, campaigns, characters, posts RESTART IDENTITY CASCADE"
+    )
   );
 
-  describe(`GET /api/habits`, () => {
-    context(`Given no habits,`, () => {
+  describe(`GET /api/campaign`, () => {
+    context(`Given no campaigns,`, () => {
       it(`responds with 200 and an empty list`, () => {
         return supertest(app)
-          .get("/api/habits")
+          .get("/api/campaign")
           .set("Authorization", `Bearer ${authToken}`)
           .expect(200, []);
       });
     });
 
-    context("Given there are habits in the db", () => {
+    context("Given there are characters in the db", () => {
       const testUsers = makeUsersArray();
-      const testHabits = makeHabitsArray();
-      const testProgress = makeProgressArray();
+      const testCampaigns = makeCampaignsArray();
+      const testCharacters = makeCharactersArray();
+      const testPosts = makePostsArray();
 
-      beforeEach("insert habits", () => {
+      beforeEach("insert campaign", () => {
         return db
           .into("users")
           .insert(testUsers)
           .then(() => {
-            return db.into("categories").insert(testHabits);
+            return db.into("campaigns").insert(testCampaigns);
           })
           .then(() => {
-            return db.into("habits").insert(testhabits);
+            return db.into("characters").insert(testCharacters);
+          })
+          .then(() => {
+            return db.into("posts").insert(testPosts);
           });
       });
 
-      it("Responds with 200 and all of the habits", () => {
+      it("Responds with 200 and all of the posts", () => {
         return supertest(app)
-          .get("/api/habits")
+          .get("/api/post")
           .set("Authorization", `Bearer ${authToken}`)
-          .expect(200, testhabits);
+          .expect(200, testPosts);
       });
     });
   });
-  describe(`GET /api/habits/:id`, () => {
-    context(`Given no habits`, () => {
+  describe(`GET /api/post/:id`, () => {
+    context(`Given no posts`, () => {
       it(`responds with 404`, () => {
-        const habitId = 123456;
+        const postId = 123456;
         return supertest(app)
-          .get(`/api/habits/${habitId}`)
+          .get(`/api/post/${postId}`)
           .set("Authorization", `Bearer ${authToken}`)
-          .expect(404, { error: { message: `Habit doesn't exist` } });
+          .expect(404, { error: { message: `Post doesn't exist` } });
       });
     });
 
-    context("Given there are habits in the database", () => {
+    context("Given there are posts in the database", () => {
       const testUsers = makeUsersArray();
-      const testHabits = makehabitsArray();
-      const testProgrss = makeProgressArray();
+      const testCampaigns = makeCampaignsArray();
+      const testCharacters = makeCharactersArray();
+      const testPosts = makePostsArray();
 
-      beforeEach("insert habits", () => {
+      beforeEach("insert posts", () => {
         return db
           .into("users")
           .insert(testUsers)
           .then(() => {
-            return db.into("categories").insert(testProgress);
+            return db.into("campaigns").insert(testCampaigns);
           })
           .then(() => {
-            return db.into("habits").insert(testHabits);
+            return db.into("characters").insert(testCharacters);
+          })
+          .then(() => {
+            return db.into("posts").insert(testPosts);
           });
       });
-      it("responds with 200 and the specified habit", () => {
-        const habit_id = 2;
-        const expectedHabit = testhabits[habit_id - 1];
+      it("responds with 200 and the specified post", () => {
+        const post_id = 2;
+        const expectedPost = testPosts[post_id - 1];
         return supertest(app)
-          .get(`/api/habits/${habit_Id}`)
+          .get(`/api/post/${post_id}`)
           .set("Authorization", `Bearer ${authToken}`)
-          .expect(200, expectedHabit);
+          .expect(200, expectedPost);
       });
     });
   });
-  describe(`POST /api/habits`, () => {
+  describe(`POST /api/posts`, () => {
     const testUsers = makeUsersArray();
-    const testHabits = makeProgressArray();
-    beforeEach("insert habit", () => {
+    const testCampaigns = makeCampaignsArray();
+    const testCharacters = makeCharactersArray();
+    const testPosts = makePostsArray();
+
+    beforeEach("insert post", () => {
       return db
         .into("users")
         .insert(testUsers)
         .then(() => {
-          return db.into("progress").insert(testHabits);
+          return db.into("characters").insert(testCharacters);
         });
     });
-    it(`creates a habit, responding with 201 and the new habit`, () => {
-      const newHabit = {
+    it(`creates a habit, responding with 201 and the new character`, () => {
+      const newCharacter = {
         id: 1,
-        category: "productivity",
-        title: "test new habit",
-        description: "test habit description",
-        checked: false,
-        category_id: 1,
         user_id: 1,
+        campagin_id: 2,
+        datecreated: "01/12/2021",
+        name: "Legolas 2",
+        race: "elf",
+        characterClass: "ranger",
+        level: 2,
+        additionalinfo: "lord of the rings 2",
       };
       return supertest(app)
-        .post("/api/habits")
+        .post("/api/characters")
         .set("Authorization", `Bearer ${authToken}`)
-        .send(newHabit)
+        .send(newCharacter)
         .expect(201)
         .expect((res) => {
-          expect(res.body.id).to.eql(newHabit.id);
-          expect(res.body.title).to.eql(newHabit.title);
-          expect(res.body.frequency).to.eql(newHabit.frequency);
-          expect(res.body.user_id).to.eql(newHabit.user_id);
+          expect(res.body.user_id).to.eql(newCharacter.user_id);
+          expect(res.body.campagin_id).to.eql(newCharacter.campagin_id);
+          expect(res.body.name).to.eql(newCharacter.name);
+          expect(res.body.race).to.eql(newCharacter.race);
+          expect(res.body.characterClass).to.eql(newCharacter.characterClass);
+          expect(res.body.level).to.eql(newCharacter.level);
           expect(res.body).to.have.property("id");
-          expect(res.headers.location).to.eql(`/api/habits/${res.body.id}`);
+          expect(res.headers.location).to.eql(`/api/character/${res.body.id}`);
           const expected = new Intl.DateTimeFormat("en-US").format(new Date());
           const actual = new Intl.DateTimeFormat("en-US").format(
             new Date(res.body.start_date)
@@ -166,157 +188,156 @@ describe(`Habits service object`, function () {
         })
         .then((res) =>
           supertest(app)
-            .get(`/api/habits/${res.body.id}`)
+            .get(`/api/character/${res.body.id}`)
             .set("Authorization", `Bearer ${authToken}`)
             .expect(res.body)
         );
     });
-    const requiredFields = ["title", "frequency", "note"];
+    const requiredFields = ["user_id", "campaign_id", "id"];
 
     requiredFields.forEach((field) => {
-      const newHabit = {
-        id: 1,
-        title: "journaling",
-        frequency: 2,
-        note: "Get your thoughts down every morning",
-        user_id: 1,
+      const newCampaign = {
+        id: 2,
+        datecreated: "01/01/2021",
+        name: "A Journey Near and Far 2",
+        completed: false,
       };
 
       it(`responds with 400 and an error message when the '${field}' is missing`, () => {
-        delete newHabit[field];
+        delete newCampaign[field];
 
         return supertest(app)
-          .post("/api/habits")
+          .post("/api/campaign")
           .set("Authorization", `Bearer ${authToken}`)
-          .send(newHabit)
+          .send(newCampaign)
           .expect(400, {
             error: { message: `Missing '${field}' in request body` },
           });
       });
     });
   });
-  describe(`DELETE /api/habits/:id`, () => {
-    context(`Given no habits`, () => {
+  describe(`DELETE /api/campaign/:id`, () => {
+    context(`Given no campaign`, () => {
       it(`responds with 404`, () => {
-        const habit_id = 123456;
+        const campaign_id = 123456;
         return supertest(app)
-          .delete(`/api/habits/${habit_id}`)
+          .delete(`/api/campaign/${campaign_id}`)
           .set("Authorization", `Bearer ${authToken}`)
-          .expect(404, { error: { message: `Habit doesn't exist` } });
+          .expect(404, { error: { message: `Campaign doesn't exist` } });
       });
     });
 
     context("Given there are habits in the database", () => {
       const testUsers = makeUsersArray();
-      const testProgress = makeProgressArray();
-      const testHabits = makehabitsArray();
+      const testCampaigns = makeCampaignsArray();
 
-      beforeEach("insert habit", () => {
+      beforeEach("insert campaign", () => {
         return db
           .into("users")
           .insert(testUsers)
           .then(() => {
-            return db.into("categories").insert(testHabits);
-          })
-          .then(() => {
-            return db.into("habits").insert(testProgress);
+            return db.into("campaign").insert(testCampaigns);
           });
       });
 
-      it("responds with 204 and removes the habit", () => {
+      it("responds with 204 and removes the campaign", () => {
         const idToRemove = 2;
-        const expectedhabits = testhabits.filter(
-          (habit) => habit.id !== idToRemove
+        const expectedCampaign = testCampaigns.filter(
+          (campaign) => campaign.id !== idToRemove
         );
         return supertest(app)
-          .delete(`/api/habits/${idToRemove}`)
+          .delete(`/api/campaign/${idToRemove}`)
           .set("Authorization", `Bearer ${authToken}`)
           .expect(204)
           .then((res) => {
-            supertest(app).get(`/api/habits`).expect(expectedhabits);
+            supertest(app).get(`/api/campaign`).expect(expectedCampaign);
           });
       });
     });
   });
-  describe(`PATCH /api/habits/:id`, () => {
-    context(`Given no habits`, () => {
+  describe(`PATCH /api/campaign/:id`, () => {
+    context(`Given no campaign`, () => {
       it(`responds with 404`, () => {
         const testId = 123456;
         return supertest(app)
-          .delete(`/api/habits/${testId}`)
+          .delete(`/api/campaign/${testId}`)
           .set("Authorization", `Bearer ${authToken}`)
-          .expect(404, { error: { message: `Habit doesn't exist` } });
+          .expect(404, { error: { message: `Campaign doesn't exist` } });
       });
     });
 
-    context("Given there are habits in the database", () => {
+    context("Given there are characters in the database", () => {
       const testUsers = makeUsersArray();
-      const testHabits = makeHabitArray();
-      const testProgress = makeProgressArray();
+      const testCampaigns = makeCampaignsArray();
+      const testCharacters = makeCharactersArray();
 
       beforeEach("insert habits", () => {
         return db
           .into("users")
           .insert(testUsers)
           .then(() => {
-            return db.into("categories").insert(testHabits);
+            return db.into("campaigns").insert(testCampaigns);
           })
           .then(() => {
-            return db.into("habits").insert(testProgress);
+            return db.into("characters").insert(testCharacters);
           });
       });
 
-      it("responds with 204 and updates the habit", () => {
+      it("responds with 204 and updates the character", () => {
         const idToUpdate = 2;
-        const updateHabit = {
-          title: "journaling",
-          frequency: 5,
-          created: "2020-01-03T00:00:00.000Z",
-          note: "Get your thoughts down every morning",
+        const updateCharacter = {
+          id: 5,
           user_id: 1,
+          campagin_id: 2,
+          datecreated: "01/13/2021",
+          name: "Legolas 4",
+          race: "elf",
+          characterClass: "ranger",
+          level: 4,
+          additionalinfo: "lord of the rings 3",
         };
-        const expectedHabit = {
-          ...testhabits[idToUpdate - 1],
-          ...updateHabit,
+        const expectedCharacter = {
+          ...testCharacters[idToUpdate - 1],
+          ...updateCharacter,
         };
         return supertest(app)
-          .patch(`/api/habits/${idToUpdate}`)
+          .patch(`/api/character/${idToUpdate}`)
           .set("Authorization", `Bearer ${authToken}`)
           .send(updateHabit)
           .expect(204)
           .then((res) =>
             supertest(app)
-              .get(`/api/habits/${idToUpdate}`)
+              .get(`/api/character/${idToUpdate}`)
               .set("Authorization", `Bearer ${authToken}`)
-              .expect(expectedHabit)
+              .expect(expectedCharacter)
           );
       });
 
       it(`responds with 400 when no required fields supplied`, () => {
         const idToUpdate = 2;
         return supertest(app)
-          .patch(`/api/habits/${idToUpdate}`)
+          .patch(`/api/character/${idToUpdate}`)
           .set("Authorization", `Bearer ${authToken}`)
           .send({ irrelevantField: "foo" })
           .expect(400, {
             error: {
-              message: `Request body must contain either 'note' or 'frequency'`,
+              message: `Request body must contain either 'characterClass' or 'race'`,
             },
           });
       });
 
       it(`responds with 204 when updating only a subset of fields`, () => {
         const idToUpdate = 2;
-        const updateHabit = {
-          title: "updated habit title",
+        const updateCharacter = {
+          name: "updated character name",
         };
-        const expectedHabit = {
-          ...testhabits[idToUpdate - 1],
-          ...updateHabit,
+        const expectedCharacter = {
+          ...testCharacters[idToUpdate - 1],
+          ...updateCharacter,
         };
 
         return supertest(app)
-          .patch(`/api/habits/${idToUpdate}`)
+          .patch(`/api/character/${idToUpdate}`)
           .set("Authorization", `Bearer ${authToken}`)
           .send({
             ...updateHabit,
@@ -325,98 +346,21 @@ describe(`Habits service object`, function () {
           .expect(204)
           .then((res) =>
             supertest(app)
-              .get(`/api/habits/${idToUpdate}`)
+              .get(`/api/character/${idToUpdate}`)
               .set("Authorization", `Bearer ${authToken}`)
-              .expect(expectedHabit)
+              .expect(expectedCharacter)
           );
       });
     });
   });
-  describe(`PUT /api/habits/:id`, () => {
-    context(`Given no habits`, () => {
+  describe(`PUT /api/character/:id`, () => {
+    context(`Given no characters`, () => {
       it(`responds with 404`, () => {
         const testId = 123456;
         return supertest(app)
-          .delete(`/api/habits/${testId}`)
+          .delete(`/api/character/${testId}`)
           .set("Authorization", `Bearer ${authToken}`)
-          .expect(404, { error: { message: `Habit doesn't exist` } });
-      });
-    });
-    context("Given there are habits in the database", () => {
-      const testUsers = makeUsersArray();
-      const testProgress = makeProgressArray();
-      const testHabits = makehabitsArray();
-
-      beforeEach("insert habits", () => {
-        return db
-          .into("users")
-          .insert(testUsers)
-          .then(() => {
-            return db.into("categories").insert(testHabits);
-          })
-          .then(() => {
-            return db.into("habits").insert(testProgress);
-          });
-      });
-      it("responds with 204 and updates the habit", () => {
-        const idToUpdate = 2;
-        const updateHabit = {
-          id: 2,
-          checked: false,
-        };
-        const expectedHabit = {
-          ...testhabits[idToUpdate - 1],
-          ...updateHabit,
-        };
-        return supertest(app)
-          .patch(`/api/habits/${idToUpdate}`)
-          .set("Authorization", `Bearer ${authToken}`)
-          .send(updateHabit)
-          .expect(204)
-          .then((res) =>
-            supertest(app)
-              .get(`/api/habits/${idToUpdate}`)
-              .set("Authorization", `Bearer ${authToken}`)
-              .expect(expectedHabit)
-          );
-      });
-      it(`responds with 400 when no required fields supplied`, () => {
-        const idToUpdate = 2;
-        return supertest(app)
-          .patch(`/api/habits/${idToUpdate}`)
-          .set("Authorization", `Bearer ${authToken}`)
-          .send({ irrelevantField: "foo" })
-          .expect(400, {
-            error: {
-              message: `Request body must contain either 'frequency' or 'title'`,
-            },
-          });
-      });
-
-      it(`responds with 204 when updating only a subset of fields`, () => {
-        const idToUpdate = 2;
-        const updateHabit = {
-          checked: true,
-        };
-        const expectedHabit = {
-          ...testhabits[idToUpdate - 1],
-          ...updateHabit,
-        };
-
-        return supertest(app)
-          .patch(`/api/habits/${idToUpdate}`)
-          .set("Authorization", `Bearer ${authToken}`)
-          .send({
-            ...updateHabit,
-            fieldToIgnore: "should not be in GET response",
-          })
-          .expect(204)
-          .then((res) =>
-            supertest(app)
-              .get(`/api/habits/${idToUpdate}`)
-              .set("Authorization", `Bearer ${authToken}`)
-              .expect(expectedHabit)
-          );
+          .expect(404, { error: { message: `character doesn't exist` } });
       });
     });
   });
