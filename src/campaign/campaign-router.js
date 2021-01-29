@@ -3,6 +3,7 @@ const express = require("express");
 const xss = require("xss");
 const logger = require("../logger");
 const CampaignService = require("./campaign-service");
+const CharacterService = require("../character/charcter-service");
 const { getCampaignValidationError } = require("./campaign-validator");
 const knex = require("knex");
 
@@ -13,13 +14,14 @@ const bodyParser = express.json();
 
 const SerializeCampaign = (campaign) => ({
   name: xss(campaign.name),
+  code: 
 });
 
 CampaignRouter.route("/")
 
   .get(requireAuth, (req, res, next) => {
     console.log({ user: req.user });
-    CampaignService.getCampaignByUser(req.app.get("db"), req.user.id)
+    CampaignService.getAllCampaigns(req.app.get("db"), req.user.id)
       .then((campaign) => {
         res.json(campaign.map(SerializeCampaign));
       })
@@ -47,6 +49,15 @@ CampaignRouter.route("/")
       .then((campaign) => {
         logger.info(`campaign with id ${campaign.id} created.`);
         // this is where we would call CharacterService.createCharacter(req.app.get('db'),req.user.id,campaign.id)
+        CharacterService.insertCharacter(req.app.get("db"), tempCharacter)
+          .then((character) => {ZZZZZXZxxxx                      
+            logger.info(`character with id ${character.id} created.`);
+            res
+              .status(201)
+              .location(path.posix.join(req.originalUrl, `${character.id}`))
+              .json(SerializeCharacter(character));
+          })
+          .catch(next);
         res
           .status(201)
           .location(path.posix.join(req.originalUrl, `${campaign.id}`))

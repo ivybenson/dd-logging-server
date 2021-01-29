@@ -2,7 +2,7 @@ const path = require("path");
 const express = require("express");
 const xss = require("xss");
 const logger = require("../logger");
-const postService = require("./post-service");
+const PostService = require("./post-service");
 const { getPostValidationError } = require("./post-validator");
 const knex = require("knex");
 
@@ -24,8 +24,7 @@ postRouter
 
   .get(requireAuth, (req, res, next) => {
     console.log({ user: req.user });
-    postService
-      .getpostByUser(req.app.get("db"), req.user.id)
+    PostService.getPostsByCharacter(req.app.get("db"), req.character.id)
       .then((posts) => {
         res.json(posts.map(SerializePost));
       })
@@ -49,8 +48,7 @@ postRouter
 
     if (error) return res.status(400).send(error);
 
-    postService
-      .insertpost(req.app.get("db"), newPost)
+    PostService.insertpost(req.app.get("db"), newPost)
       .then((post) => {
         logger.info(`post with id ${post.id} created.`);
         res
@@ -66,8 +64,7 @@ postRouter
 
   .all((req, res, next) => {
     const { post_id } = req.params;
-    postService
-      .getPostById(req.app.get("db"), post_id)
+    PostService.getPostById(req.app.get("db"), post_id)
       .then((post) => {
         if (!post) {
           logger.error(`Post with id ${post_id} not found.`);
@@ -88,8 +85,7 @@ postRouter
 
   .delete((req, res, next) => {
     const { post_id } = req.params;
-    postService
-      .deletePost(req.app.get("db"), post_id)
+    PostService.deletePost(req.app.get("db"), post_id)
       .then((numRowsAffected) => {
         logger.info(`Post with id ${post_id} deleted.`);
         res.status(204).end();
@@ -115,8 +111,7 @@ postRouter
 
     if (error) return res.status(400).send(error);
 
-    postService
-      .updatePost(req.app.get("db"), req.params.post_id, postToUpdate)
+    PostService.updatePost(req.app.get("db"), req.params.post_id, postToUpdate)
       .then((numRowsAffected) => {
         res.status(204).end();
       })

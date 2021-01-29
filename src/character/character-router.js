@@ -19,7 +19,7 @@ CharacterRouter.route("/")
 
   .get(requireAuth, (req, res, next) => {
     console.log({ user: req.user });
-    CharacterService.getCampaignById(req.app.get("db"), req.user.id)
+    CharacterService.getCharacterByUser(req.app.get("db"), req.user.id)
       .then((character) => {
         res.json(character.map(SerializeCharacter));
       })
@@ -66,6 +66,75 @@ CharacterRouter.route("/")
           .status(201)
           .location(path.posix.join(req.originalUrl, `${character.id}`))
           .json(SerializeCharacter(character));
+      })
+      .catch(next);
+  });
+
+CharacterRouter.route("/:character_id")
+
+  .all((req, res, next) => {
+    const { character_id } = req.params;
+    CharacterService.getCharacterById(req.app.get("db"), character_id)
+      .then((character) => {
+        if (!character) {
+          logger.error(`Character with id ${character_id} not found.`);
+          return res.status(404).json({
+            error: { message: `Character Not Found` },
+          });
+        }
+
+        res.character = character;
+        next();
+      })
+      .catch(next);
+  })
+
+  .get((req, res) => {
+    res.json(SerializeCharacter(res.character));
+  })
+
+  .patch(bodyParser, (req, res, next) => {
+    const {
+      campaign_id,
+      user_id,
+      name,
+      race,
+      characterClass,
+      level,
+      additionalInfo,
+    } = req.body;
+    const characterToUpdate = {
+      campaign_id,
+      user_id,
+      name,
+      race,
+      characterClass,
+      level,
+      additionalInfo,
+    };
+
+    const numberOfValues = Object.values(characterToUpdate).filter(Boolean)
+      .length;
+    if (numberOfValues === 0) {
+      logger.error(`Invalid update without required fields`);
+      return res.status(400).json({
+        error: {
+          message: `Request body must content either 'character_id', 'title' or 'content'`,
+        },
+      });
+    }
+
+    const error = getCharacterValidationError(characterToUpdate);
+
+    if (error) return res.status(400).send(error);
+
+    CharacterService.updateCharacter(
+      req.app.get("db"),
+      req.params.character_id,
+      characterToUpdate
+    )
+      .then((numRowsAffected) => {
+        res.status(204).end();
       })
       .catch(next);
   });

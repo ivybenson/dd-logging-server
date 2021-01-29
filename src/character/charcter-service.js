@@ -1,16 +1,12 @@
 const knex = require("knex");
 
-const characterService = {
+const CharacterService = {
   getCharacternById(knex, id) {
     return knex.from("characters").select("*").where({ id }).first();
   },
 
   getCharacterByUser(knex, user_id) {
-    return knex
-      .from("characters")
-      .select("*")
-      .where({ user_id })
-      .orderBy("created", "desc");
+    return knex.from("characters").select("*").where({ user_id });
   },
 
   insertCharacter(knex, newCharacter) {
@@ -30,4 +26,4 @@ const characterService = {
   //   },
 };
 
-module.exports = characterService;
+module.exports = CharacterService;

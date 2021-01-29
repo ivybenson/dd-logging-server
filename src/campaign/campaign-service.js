@@ -1,6 +1,6 @@
 const knex = require("knex");
 
-const campaignService = {
+const CampaignService = {
   getAllCampaigns(knex) {
     return knex.select("*").from("campaigns");
   },
@@ -9,7 +9,7 @@ const campaignService = {
     return knex.from("campaigns").select("*").where({ id }).first();
   },
 
-  getCampaignsByUser(knex, user_id) {
+  getCampaignByUser(knex, user_id) {
     return knex
       .from("campaigns")
       .select("*")
@@ -33,4 +33,4 @@ const campaignService = {
   //   },
 };
 
-module.exports = campaignService;
+module.exports = CampaignService;

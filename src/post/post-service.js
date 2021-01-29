@@ -1,6 +1,6 @@
 const knex = require("knex");
 
-const postService = {
+const PostService = {
   getAllPosts(knex) {
     return knex.select("*").from("posts");
   },
@@ -9,11 +9,11 @@ const postService = {
     return knex.from("posts").select("*").where({ id }).first();
   },
 
-  getPostByUser(knex, user_id) {
+  getPostsByCharacter(knex, character_id) {
     return knex
       .from("posts")
       .select("*")
-      .where({ user_id })
+      .where({ character_id })
       .orderBy("created", "desc");
   },
 
@@ -33,4 +33,4 @@ const postService = {
   },
 };
 
-module.exports = postService;
+module.exports = PostService;
