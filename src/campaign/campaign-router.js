@@ -14,16 +14,14 @@ const bodyParser = express.json();
 
 const SerializeCampaign = (campaign) => ({
   name: xss(campaign.name),
-  code: 
 });
 
 CampaignRouter.route("/")
 
   .get(requireAuth, (req, res, next) => {
-    console.log({ user: req.user });
-    CampaignService.getAllCampaigns(req.app.get("db"), req.user.id)
+    CampaignService.getCampaignById(req.app.get("db"), req.user.id)
       .then((campaign) => {
-        res.json(campaign.map(SerializeCampaign));
+        res.json({ campaign });
       })
       .catch(next);
   })
@@ -48,20 +46,42 @@ CampaignRouter.route("/")
     CampaignService.insertCampaign(req.app.get("db"), newCampaign)
       .then((campaign) => {
         logger.info(`campaign with id ${campaign.id} created.`);
-        // this is where we would call CharacterService.createCharacter(req.app.get('db'),req.user.id,campaign.id)
-        CharacterService.insertCharacter(req.app.get("db"), tempCharacter)
-          .then((character) => {ZZZZZXZxxxx                      
-            logger.info(`character with id ${character.id} created.`);
-            res
-              .status(201)
-              .location(path.posix.join(req.originalUrl, `${character.id}`))
-              .json(SerializeCharacter(character));
-          })
-          .catch(next);
-        res
+        createTempCharacter(req.user, campaign, req, res, next);
+        /* res
           .status(201)
           .location(path.posix.join(req.originalUrl, `${campaign.id}`))
-          .json(SerializeCampaign(campaign));
+          .json(SerializeCampaign(campaign));*/
+      })
+      .catch(next);
+  });
+
+function createTempCharacter(user, campaign, req, res, next) {
+  // this is where we would call CharacterService.createCharacter(req.app.get('db'),req.user.id,campaign.id)
+  const tempCharacter = { user_id: user.id, campaign_id: campaign.id };
+  CharacterService.insertCharacter(req.app.get("db"), tempCharacter)
+    .then((character) => {
+      logger.info(`character with id ${character.id} created.`);
+      res
+        .status(201)
+        .location(path.posix.join(req.originalUrl, `${character.id}`))
+        .json({ character, campaign });
+    })
+    .catch(next);
+}
+
+CampaignRouter.route("/:campaign_id")
+  .get(requireAuth, (req, res, next) => {
+    CampaignService.getCampaignById(req.app.get("db"), req.params.campaign_id)
+      .then((campaign) => {
+        res.json({ campaign });
+      })
+      .catch(next);
+  })
+  .post(requireAuth, (req, res, next) => {
+    CampaignService.getCampaignById(req.app.get("db"), req.params.campaign_id)
+      .then((campaign) => {
+        //res.json(campaign);
+        createTempCharacter(req.user, campaign, req, res, next);
       })
       .catch(next);
   });

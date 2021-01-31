@@ -8,13 +8,19 @@ const PostService = {
   getPostById(knex, id) {
     return knex.from("posts").select("*").where({ id }).first();
   },
-
   getPostsByCharacter(knex, character_id) {
     return knex
       .from("posts")
       .select("*")
       .where({ character_id })
-      .orderBy("created", "desc");
+      .orderBy("datecreated", "desc");
+  },
+  getAllPostsByCharacters(knex, character_ids) {
+    return knex
+      .from("posts")
+      .select("*")
+      .whereIn("character_id", character_ids)
+      .orderBy("datecreated", "desc");
   },
 
   insertPost(knex, newPost) {

@@ -1,12 +1,14 @@
 const knex = require("knex");
 
 const CharacterService = {
-  getCharacternById(knex, id) {
+  getCharacterById(knex, id) {
     return knex.from("characters").select("*").where({ id }).first();
   },
-
+  getAllCharacterIDsByCampaignId(knex, campaign_id) {
+    return knex.from("characters").select("id").where({ campaign_id });
+  },
   getCharacterByUser(knex, user_id) {
-    return knex.from("characters").select("*").where({ user_id });
+    return knex.from("characters").select("*").where({ user_id }).first();
   },
 
   insertCharacter(knex, newCharacter) {
@@ -18,7 +20,11 @@ const CharacterService = {
   },
 
   updateCharacter(knex, id, newCharacterFields) {
-    return knex("characters").where({ id }).update(newCharacterFields);
+    return knex("characters")
+      .where({ id })
+      .update(newCharacterFields)
+      .returning("*")
+      .then((rows) => rows[0]);
   },
 
   //   deleteCharacter(knex, id) {

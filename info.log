@@ -1,1 +1,19 @@
 {"message":"name is required","level":"error"}
+{"message":"campaign with id 1 created.","level":"info"}
+{"message":"campaign with id 2 created.","level":"info"}
+{"message":"campaign with id 3 created.","level":"info"}
+{"message":"character with id 3 created.","level":"info"}
+{"message":"campaign with id 1 created.","level":"info"}
+{"message":"campaign with id 2 created.","level":"info"}
+{"message":"character with id 1 created.","level":"info"}
+{"message":"character with id 2 created.","level":"info"}
+{"message":"campaign with id 1 created.","level":"info"}
+{"message":"character with id 1 created.","level":"info"}
+{"message":"name is required","level":"error"}
+{"message":"completed is required","level":"error"}
+{"message":"completed is required","level":"error"}
+{"message":"post with id 1 created.","level":"info"}
+{"message":"post with id 2 created.","level":"info"}
+{"message":"post with id 3 created.","level":"info"}
+{"message":"character with id 2 created.","level":"info"}
+{"message":"post with id 4 created.","level":"info"}

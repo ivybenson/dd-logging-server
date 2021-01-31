@@ -64,7 +64,7 @@ usersRouter
 
       return UsersService.hashPassword(password).then((hashedPassword) => {
         const newUser = {
-          email,
+          email: email,
           password: hashedPassword,
         };
 

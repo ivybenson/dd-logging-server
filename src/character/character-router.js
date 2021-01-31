@@ -12,16 +12,21 @@ const CharacterRouter = express.Router();
 const bodyParser = express.json();
 
 const SerializeCharacter = (character) => ({
+  campaign_id: character.campaign_id,
+  user_id: character.user_id,
   name: xss(character.name),
+  race: xss(character.race),
+  characterClass: xss(character.characterClass),
+  level: character.level,
+  additionalInfo: xss(character.additionalInfo),
 });
 
 CharacterRouter.route("/")
 
   .get(requireAuth, (req, res, next) => {
-    console.log({ user: req.user });
     CharacterService.getCharacterByUser(req.app.get("db"), req.user.id)
       .then((character) => {
-        res.json(character.map(SerializeCharacter));
+        res.json({ character });
       })
       .catch(next);
   })
@@ -93,7 +98,7 @@ CharacterRouter.route("/:character_id")
     res.json(SerializeCharacter(res.character));
   })
 
-  .patch(bodyParser, (req, res, next) => {
+  .put(bodyParser, (req, res, next) => {
     const {
       campaign_id,
       user_id,
@@ -133,8 +138,8 @@ CharacterRouter.route("/:character_id")
       req.params.character_id,
       characterToUpdate
     )
-      .then((numRowsAffected) => {
-        res.status(204).end();
+      .then((updatedCharacter) => {
+        res.status(200).json(updatedCharacter);
       })
       .catch(next);
   });

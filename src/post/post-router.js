@@ -5,6 +5,7 @@ const logger = require("../logger");
 const PostService = require("./post-service");
 const { getPostValidationError } = require("./post-validator");
 const knex = require("knex");
+const CharacterService = require("../character/charcter-service");
 
 const { requireAuth } = require("../middleware/jwt-auth");
 
@@ -12,30 +13,47 @@ const postRouter = express.Router();
 const bodyParser = express.json();
 
 const SerializePost = (post) => ({
-  id: posts.id,
-  character_id: posts.characters_id,
-  title: xss(posts.title),
-  content: xss(posts.content),
-  completed: posts.completed,
+  id: post.id,
+  character_id: post.characters_id,
+  title: xss(post.title),
+  content: xss(post.content),
+  completed: post.completed,
 });
 
 postRouter
   .route("/")
 
   .get(requireAuth, (req, res, next) => {
-    console.log({ user: req.user });
-    PostService.getPostsByCharacter(req.app.get("db"), req.character.id)
-      .then((posts) => {
-        res.json(posts.map(SerializePost));
-      })
-      .catch(next);
+    let knexInstance = req.app.get("db");
+    // get the character for the user
+    CharacterService.getCharacterByUser(knexInstance, req.user.id).then(
+      (character) => {
+        // get all characters for that campaign
+        if (!character) {
+          res.json([]);
+        } else {
+          CharacterService.getAllCharacterIDsByCampaignId(
+            knexInstance,
+            character.campaign_id
+          ).then((characterIDs) => {
+            characterIDs = characterIDs.map((c) => c.id);
+            PostService.getAllPostsByCharacters(
+              knexInstance,
+              characterIDs
+            ).then((posts) => {
+              res.json({ posts });
+            });
+          });
+        }
+      }
+    );
   })
 
   .post(requireAuth, bodyParser, (req, res, next) => {
-    const { name } = req.body;
-    const newPost = { name };
+    const { character_id, content, private, title } = req.body;
+    const newPost = { character_id, content, completed: private, title };
 
-    for (const field of ["name"]) {
+    for (const field of ["character_id", "content", "title"]) {
       if (!newPost[field]) {
         logger.error(`${field} is required`);
         return res.status(400).send({
@@ -44,11 +62,7 @@ postRouter
       }
     }
 
-    const error = getpostValidationError(newPost);
-
-    if (error) return res.status(400).send(error);
-
-    PostService.insertpost(req.app.get("db"), newPost)
+    PostService.insertPost(req.app.get("db"), newPost)
       .then((post) => {
         logger.info(`post with id ${post.id} created.`);
         res
