@@ -15,6 +15,7 @@ const bodyParser = express.json();
 const SerializePost = (post) => ({
   id: post.id,
   character_id: post.characters_id,
+  character_name: post.characters_name,
   title: xss(post.title),
   content: xss(post.content),
   completed: post.completed,
@@ -50,8 +51,14 @@ postRouter
   })
 
   .post(requireAuth, bodyParser, (req, res, next) => {
-    const { character_id, content, private, title } = req.body;
-    const newPost = { character_id, content, completed: private, title };
+    const { character_id, content, private, title, character_name } = req.body;
+    const newPost = {
+      character_id,
+      content,
+      completed: private,
+      title,
+      character_name,
+    };
 
     for (const field of ["character_id", "content", "title"]) {
       if (!newPost[field]) {

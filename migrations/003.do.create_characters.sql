@@ -4,9 +4,9 @@ CREATE TABLE characters (
     REFERENCES campaigns(id) ON DELETE CASCADE NOT NULL, 
   user_id INTEGER 
     REFERENCES users(id) ON DELETE CASCADE NOT NULL,
-  name TEXT NOT NULL DEFAULT 'Legolas', 
-  race TEXT NOT NULL DEFAULT 'elf',
-  "characterClass" TEXT NOT NULL DEFAULT 'ranger', 
+  name TEXT NOT NULL DEFAULT '', 
+  race TEXT NOT NULL DEFAULT '',
+  "characterClass" TEXT NOT NULL DEFAULT '', 
   level INTEGER DEFAULT '1', 
   "additionalInfo" TEXT, 
   datecreated TIMESTAMPTZ DEFAULT now() NOT NULL
