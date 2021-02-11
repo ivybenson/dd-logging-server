@@ -1,27 +1,100 @@
-# Express Boilerplate!
+# Dungeons Truth - API
 
-This is a boilerplate project used for starting new projects!
+Tell your story your way
 
-## Set up
+Live app: (https://dungeons-truth-ggdcc6s1c.vercel.app/
 
-Complete the following steps to start a new project (NEW-PROJECT-NAME):
+## Intro
 
-1. Clone this repository to your local machine `git clone BOILERPLATE-URL NEW-PROJECTS-NAME`
-2. `cd` into the cloned repository
-3. Make a fresh start of the git history for this project with `rm -rf .git && git init`
-4. Install the node dependencies `npm install`
-5. Move the example Environment file to `.env` that will be ignored by git and read by the express server `mv example.env .env`
-6. Edit the contents of the `package.json` to use NEW-PROJECT-NAME instead of `"name": "express-boilerplate",`
-7. Code and enjoy baybeee.
+Dungeons Truth is an app that role playing game players can use to create a more rounded out experience when playing the game. When players can only meet when their whole party can play, it can be hard to remember every detail of the story. Dungeons Truth acts as a platform to log the players and characters experiences throughout the campaign. Upon log in users create a campaign that displays a code. Once the code is created all players can add themselves into the game on the same campaign code log their journey together. Users log their player information including name, character race, class, level, and any additional information they would like to track. On campaign log users can post publicly and privately taking down towns they have traveled to, who they meet, what creatures they fight, and magical objects they pick. As campaigns can take weeks to months to years it is hard to remember everything the players and characters have gotten up to in their journey. Log in and tell your story with Dungeons Truth.
 
-## Scripts
+## Technologies
 
-Start the application `npm start`
+- Node and Express
+  - Authentication via JWT
+  - RESTful API
+- Testing
+  - Supertest (integration)
+    -Mocha and Chai (unit)
+- Database
+  - Postgres SQL
+  - Knex.js
 
-Start nodemon for the application `npm run dev`
+## Deployed with Heroku
 
-Run the tests `npm test`
+## API Endpoints
 
-## Deploying
+### Users Router
 
-When your new project is ready for deployment, add a new Heroku application with `heroku create`. This will make a new git remote called "heroku" and you can then `npm run deploy` which will push to this remote's master branch.
+```
+
+-/api/users
+
+-- GET - gets all users
+
+-- POST - creates a new user
+```
+
+### Campaign Router
+
+```
+
+-/api/campaign/
+
+-- GET - gets campaign by user
+
+-- POST - creates a new campaign
+```
+
+### Campaign/:campaign_id Router
+
+```
+
+-/api/campaign/:campaign_id
+
+-- GET - gets campaign by campaign_id
+
+-- POST - creates a temporary character to attach to the campaign for the creator
+
+```
+
+### Character Router
+
+```
+
+-/api/character/
+
+-- GET - gets character by user
+
+-- DELETE - creates a new character by campaign name
+```
+
+### Character/:id Router (not in use for current version)
+
+```
+
+-/api/character/:character_id
+
+-- GET - gets character by user_id
+
+-- PUT - updates character by id
+```
+
+### Post Router
+
+```
+-/api/post
+
+-- GET - gets all posts attached to character ids
+
+-- POST - creates new post in campaign
+```
+
+### Post/:post_id Router
+
+```
+
+-/api/progress/:byhabits
+
+-- GET - gets posts in campaign
+```
